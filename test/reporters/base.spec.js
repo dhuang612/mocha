@@ -50,16 +50,17 @@ describe('Base reporter', function() {
 
   describe('showDiff', function() {
     var err;
-
+    var failedStatus;
+    var expected;
     beforeEach(function() {
       err = new AssertionError({actual: 'foo', expected: 'bar'});
+      expected = "<div id='progress-bar.error'></div>";
     });
 
     it('should show diffs by default', function() {
       var test = makeTest(err);
-      var failedStatus;
-      if (process.browser) {
-        failedStatus = '<div id="progress-bar.error"></div>';
+      if (reporters.html) {
+        failedStatus = "<div id='progress-bar.error'></div>";
       }
       list([test]);
 
@@ -67,19 +68,24 @@ describe('Base reporter', function() {
       expect(errOut, 'to match', /- actual/);
       expect(errOut, 'to match', /\+ expected/);
       if (failedStatus) {
-        expect(failedStatus, 'to match', "<div id='progress-bar.error'></div>");
+        assert.strictEqual(failedStatus, expected);
       }
     });
 
     it("should show diffs if 'err.showDiff' is true", function() {
       err.showDiff = true;
       var test = makeTest(err);
-
+      if (reporters.html) {
+        failedStatus = "<div id='progress-bar.error'></div>";
+      }
       list([test]);
 
       var errOut = stdout.join('\n');
       expect(errOut, 'to match', /- actual/);
       expect(errOut, 'to match', /\+ expected/);
+      if (failedStatus) {
+        assert.strictEqual(failedStatus, expected);
+      }
     });
 
     it("should not show diffs if 'err.showDiff' is false", function() {
