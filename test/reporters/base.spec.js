@@ -57,12 +57,18 @@ describe('Base reporter', function() {
 
     it('should show diffs by default', function() {
       var test = makeTest(err);
-
+      var failedStatus;
+      if (process.browser) {
+        failedStatus = '<div id="progress-bar.error"></div>';
+      }
       list([test]);
 
       var errOut = stdout.join('\n');
       expect(errOut, 'to match', /- actual/);
       expect(errOut, 'to match', /\+ expected/);
+      if (failedStatus) {
+        expect(failedStatus, 'to match', "<div id='progress-bar.error'></div>");
+      }
     });
 
     it("should show diffs if 'err.showDiff' is true", function() {
